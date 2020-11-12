@@ -26,6 +26,12 @@ app.get('/', (req, res) => {
   res.send('Hello Worldd!')
 })
 
+app.get('/api/v1/messages', (req, res) => {
+  Message.find(function (err, messages) {
+    if (err) return console.error(err);
+    res.send(messages);
+  })
+})
 app.listen(port,() => {
     console.log(`Server is running on port ${port}`)
     console.log(`AdminBro is under localhost:${port}/admin`)
