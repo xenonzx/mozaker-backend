@@ -20,12 +20,12 @@ const messageSchema = new mongoose.Schema({ text: {type: String ,required: true}
 
 const Message = mongoose.model('Messsage', messageSchema )
 
-messageSchema.post('save', function(next){
-  console.error("save post");
-  now = new Date();
-  this.updated_at = now;
-  next();
-});
+// messageSchema.post('save', function(next){
+//   console.error("save post");
+//   now = new Date();
+//   this.updated_at = now;
+//   next();
+// });
 
 const AdminBroOptions = {
   resources: [Message],
