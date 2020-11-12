@@ -12,7 +12,20 @@ let port = process.env.PORT || defaultPort
 
 mongoose.connect(process.env.MONGO_DB_URL, {useNewUrlParser: true, useUnifiedTopology: true});
 AdminBro.registerAdapter(AdminBroMongoose)
-const Message = mongoose.model('Messsage', { text: String })
+
+const messageSchema = new mongoose.Schema({ text: {type: String ,required: true} ,
+  created_at    : { type: Date, required: true, default: Date.now },
+  updated_at    : { type: Date }
+});
+
+const Message = mongoose.model('Messsage', messageSchema )
+
+messageSchema.post('save', function(next){
+  console.error("save post");
+  now = new Date();
+  this.updated_at = now;
+  next();
+});
 
 const AdminBroOptions = {
   resources: [Message],
