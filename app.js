@@ -38,11 +38,26 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/v1/messages', (req, res) => {
-  Message.find(function (err, messages) {
-    if (err) return console.error(err);
+  var date
+  if (typeof req.query.time === 'undefined') {
+    var defaultTime='2012-06-10T10:00:00+04:00';
+    date = new Date(defaultTime);
+  } else {
+    date = new Date(req.query.time)
+  }
+  
+  console.log('time ' + req.query.time);
+  
+  Message.where('updatedAt').gt(date)
+  .exec(function (err, messages) {
+    if (err) {
+      console.error(err);
+      res.status(500).send();
+    }
     res.send(messages);
   })
 })
+
 app.listen(port,() => {
     console.log(`Server is running on port ${port}`)
     console.log(`AdminBro is under localhost:${port}/admin`)
