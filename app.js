@@ -38,15 +38,10 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/v1/messages', (req, res) => {
-  var date
-  if (typeof req.query.time === 'undefined') {
-    var defaultTime='2012-06-10T10:00:00+04:00';
-    date = new Date(defaultTime);
-  } else {
-    date = new Date(req.query.time)
-  }
+  var date = parseDateParam(req.query.time)
   
   console.log('time ' + req.query.time);
+  console.log('time ' + date);
   
   Message.where('updatedAt').gt(date)
   .exec(function (err, messages) {
@@ -64,3 +59,13 @@ app.listen(port,() => {
 });
   
   
+function parseDateParam(time){
+  var date
+  if (typeof time === 'undefined') {
+    var defaultTime='2012-06-10T10:00:00+04:00';
+    date = new Date(defaultTime);
+  } else {
+    date = new Date(time)
+  }
+  return date
+}
