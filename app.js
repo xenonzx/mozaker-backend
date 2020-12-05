@@ -4,6 +4,8 @@ const env = require('dotenv');
 const mongoose = require('mongoose');
 const AdminBroMongoose = require('@admin-bro/mongoose')
 const AdminBroExpress = require('@admin-bro/express')
+const session = require('express-session');
+var sessParams = require('./my-session-params');
 
 env.config();
 const app = express()
@@ -24,10 +26,17 @@ const AdminBroOptions = {
 
 const adminBro = new AdminBro(AdminBroOptions)
 const router = AdminBroExpress.buildRouter(adminBro)
-app.use(adminBro.options.rootPath, router)
+app.use(adminBro.options.rootPath, router);
+app.use(session(sessParams));
 
 app.get('/', (req, res) => {
-  res.send('Hello Worldd!')
+  if(req.session.page_views){
+    req.session.page_views++;
+    res.send("You visited this page " + req.session.page_views + " times");
+ } else {
+    req.session.page_views = 1;
+    res.send("Welcome to this page for the first time!!");
+ }
 })
 
 app.get('/api/v1/messages', (req, res) => {
