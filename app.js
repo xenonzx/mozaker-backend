@@ -45,7 +45,9 @@ User.find().exec(function (err, users) {
 function insertSuperAdmin(){
   const email = "superadmin"
   const password = "abcd"
-  const encryptedPassword =  bcrypt.hashSync(password, 10) 
+  const saltRounds = 10;
+  const salt = bcrypt.genSaltSync(saltRounds);
+  const encryptedPassword =  bcrypt.hashSync(password, salt) 
   var sAdmin = new User({email: email, encryptedPassword: encryptedPassword,role:'admin'});
   sAdmin.save(function(err, document){
     if (err) {
