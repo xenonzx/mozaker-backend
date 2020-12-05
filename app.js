@@ -41,8 +41,12 @@ User.find().exec(function (err, users) {
     insertSuperAdmin();
   }
 })
+
 function insertSuperAdmin(){
-  var sAdmin = new User({email: 'a', encryptedPassword: 'b',role:'admin'});
+  const email = "superadmin"
+  const password = "abcd"
+  const encryptedPassword =  bcrypt.hashSync(password, 10) 
+  var sAdmin = new User({email: email, encryptedPassword: encryptedPassword,role:'admin'});
   sAdmin.save(function(err, document){
     if (err) {
       console.error(err);
@@ -50,16 +54,16 @@ function insertSuperAdmin(){
     console.log("added super admin")
   })
 }
-//encryptedPassword: await bcrypt.hash(request.payload.password, 10)
+//
 
 const adminBro = new AdminBro(AdminBroOptions)
 const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
   authenticate: async (email, password) => {
     const user = await User.findOne({ email })
     if (user) {
-      //const matched = await bcrypt.compare(password, user.encryptedPassword)
+      const matched = await bcrypt.compare(password, user.encryptedPassword)
     
-      const matched = password==user.encryptedPassword
+      //const matched = password==user.encryptedPassword
       if (matched) {
         return user
       }
