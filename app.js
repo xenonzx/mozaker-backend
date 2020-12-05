@@ -6,6 +6,7 @@ const AdminBroMongoose = require('@admin-bro/mongoose')
 const AdminBroExpress = require('@admin-bro/express')
 const session = require('express-session');
 var sessParams = require('./my-session-params');
+const bcrypt = require('bcrypt')
 
 env.config();
 const app = express()
@@ -18,14 +19,57 @@ AdminBro.registerAdapter(AdminBroMongoose)
 const messageSchema = new mongoose.Schema({ text: {type: String ,required: true} 
 }, { timestamps: true });
 
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  encryptedPassword: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'restricted'], required: true },
+});
+
+const User = mongoose.model('User', userSchema)
 const Message = mongoose.model('Messsage', messageSchema )
 
 const AdminBroOptions = {
-  resources: [Message],
+  resources: [Message,User],
 }
+User.find().exec(function (err, users) {
+  if (err) {
+    console.error(err);
+  }
+
+  if (users.length == 0){
+    console.log("no users in the system")
+    insertSuperAdmin();
+  }
+})
+function insertSuperAdmin(){
+  var sAdmin = new User({email: 'a', encryptedPassword: 'b',role:'admin'});
+  sAdmin.save(function(err, document){
+    if (err) {
+      console.error(err);
+    }
+    console.log("added super admin")
+  })
+}
+//encryptedPassword: await bcrypt.hash(request.payload.password, 10)
 
 const adminBro = new AdminBro(AdminBroOptions)
-const router = AdminBroExpress.buildRouter(adminBro)
+const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
+  authenticate: async (email, password) => {
+    const user = await User.findOne({ email })
+    if (user) {
+      //const matched = await bcrypt.compare(password, user.encryptedPassword)
+    
+      const matched = password==user.encryptedPassword
+      if (matched) {
+        return user
+      }
+    }
+    return false
+  },
+  cookiePassword: 'some-secret-password-used-to-secure-cookie',
+})
+//TODO remove router 2
+//const router2 = AdminBroExpress.buildRouter(adminBro)
 app.use(adminBro.options.rootPath, router);
 app.use(session(sessParams));
 
