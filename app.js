@@ -16,21 +16,13 @@ let port = process.env.PORT || defaultPort
 mongoose.connect(process.env.MONGO_DB_URL, {useNewUrlParser: true, useUnifiedTopology: true});
 AdminBro.registerAdapter(AdminBroMongoose)
 
-const messageSchema = new mongoose.Schema({ text: {type: String ,required: true} 
-}, { timestamps: true });
-
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  encryptedPassword: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'restricted'], required: true },
-});
-
-const User = mongoose.model('User', userSchema)
-const Message = mongoose.model('Messsage', messageSchema )
-
+const User = require('./model/User');
+const Message =require('./model/Message');
+ 
 const AdminBroOptions = {
   resources: [Message,User],
 }
+
 User.find().exec(function (err, users) {
   if (err) {
     console.error(err);
@@ -43,8 +35,8 @@ User.find().exec(function (err, users) {
 })
 
 function insertSuperAdmin(){
-  const email = "superadmin"
-  const password = "abcd"
+  const email = process.env.SUPER_ADMIN_EMAIL
+  const password = process.env.SUPER_ADMIN_PASS
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
   const encryptedPassword =  bcrypt.hashSync(password, salt) 
@@ -56,7 +48,6 @@ function insertSuperAdmin(){
     console.log("added super admin")
   })
 }
-//
 
 const adminBro = new AdminBro(AdminBroOptions)
 const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
@@ -64,8 +55,6 @@ const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
     const user = await User.findOne({ email })
     if (user) {
       const matched = await bcrypt.compare(password, user.encryptedPassword)
-    
-      //const matched = password==user.encryptedPassword
       if (matched) {
         return user
       }
@@ -74,8 +63,7 @@ const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
   },
   cookiePassword: 'some-secret-password-used-to-secure-cookie',
 })
-//TODO remove router 2
-//const router2 = AdminBroExpress.buildRouter(adminBro)
+
 app.use(adminBro.options.rootPath, router);
 app.use(session(sessParams));
 
