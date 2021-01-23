@@ -17,10 +17,11 @@ mongoose.connect(process.env.MONGO_DB_URL, {useNewUrlParser: true, useUnifiedTop
 AdminBro.registerAdapter(AdminBroMongoose)
 
 const User = require('./model/User');
-const Message =require('./model/Message');
+const Message = require('./model/Message');
+const Category = require('./model/Category');
  
 const AdminBroOptions = {
-  resources: [Message,User],
+  resources: [Message, User, Category],
 }
 
 User.find().exec(function (err, users) {

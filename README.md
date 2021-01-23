@@ -9,6 +9,9 @@ TODO connect to mongo atlas
 TODO serve welcome page at /
 TODO add version api to know db version
 TODO add api that return leatest version of collection
+TODO add input validation
+add protobuff as format for request and response
+
 
 
 #learning 
