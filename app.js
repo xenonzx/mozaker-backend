@@ -93,6 +93,21 @@ app.get('/api/v1/messages', (req, res) => {
     res.send(messages);
   })
 })
+app.get('/api/v1/categories', (req, res) => {
+  var date = parseDateParam(req.query.time)
+  
+  console.log('time ' + req.query.time);
+  console.log('time ' + date);
+  
+  Category.where('updatedAt').gt(date)
+  .exec(function (err, categories) {
+    if (err) {
+      console.error(err);
+      res.status(500).send();
+    }
+    res.send(categories);
+  })
+})
 
 app.listen(port,() => {
     console.log(`Server is running on port ${port}`)
