@@ -7,7 +7,7 @@ const messageSchema = new mongoose.Schema({
     notificationDate :{type: Date},
     timeWindowBefore :{type:Number, default: 1},
     timeWindowAfter :{type:Number, default: 1},
-    categoryId:{
+    category:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
     }

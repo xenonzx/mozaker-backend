@@ -13,7 +13,7 @@ TODO add input validation
 add protobuff as format for request and response
 
 
-
+TODO check delet action current problem if you deleted a message or category it will remain on the mobiel deveice 
 #learning 
 Hapi
 KOA

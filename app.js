@@ -85,6 +85,7 @@ app.get('/api/v1/messages', (req, res) => {
   console.log('time ' + date);
   
   Message.where('updatedAt').gt(date)
+  .populate("category")
   .exec(function (err, messages) {
     if (err) {
       console.error(err);
